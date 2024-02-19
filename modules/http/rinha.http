@@ -4,10 +4,13 @@ Content-Type: application/json
 
 {
   "valor": 1,
-  "tipo" : "c",
-  "descricao" : "descricao"
+  "tipo" : "d",
+  "descricao" : "devolve"
 }
 
 ### Get Statement
 GET http://localhost:9999/clientes/1/extrato
 Content-Type: application/json
+
+### Health Check
+GET http://localhost:9999/health

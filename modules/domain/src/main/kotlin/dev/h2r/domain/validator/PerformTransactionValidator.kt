@@ -1,15 +1,16 @@
 package dev.h2r.domain.validator
 
 import dev.h2r.domain.entity.Transaction
-import java.math.BigInteger
 
 object PerformTransactionValidator {
     fun validate(transaction: Transaction) {
-        require(transaction.value > BigInteger.ZERO) { "Invalid transaction value" }
-        require(
-            transaction.description.isNotBlank()
-                    && transaction.description.length > 1
-                    && transaction.description.length < 10
-        ) { "Invalid transaction description" }
+        require(transaction.value > 0) { "Invalid transaction value ${transaction.value}" }
+        require(isValidDescription(transaction.description)) {
+            "Invalid transaction description ${transaction.description}"
+        }
     }
+
+    private fun isValidDescription(description: String) =
+        description.isNotBlank() && description.length <= 10
+
 }

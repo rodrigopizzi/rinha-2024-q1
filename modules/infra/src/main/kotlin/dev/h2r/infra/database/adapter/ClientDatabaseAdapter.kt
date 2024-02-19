@@ -11,7 +11,7 @@ import dev.h2r.domain.entity.TransactionType
 import dev.h2r.domain.port.ClientDatabasePort
 import dev.h2r.infra.database.DatabaseSingleton
 import org.bson.Document
-import java.math.BigInteger
+import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 class ClientDatabaseAdapter : ClientDatabasePort {
@@ -20,23 +20,23 @@ class ClientDatabaseAdapter : ClientDatabasePort {
         DatabaseSingleton.database.getCollection("clients")
     }
 
-    override fun updateBalance(client: Client, transaction: Transaction, newBalance: BigInteger): Client? {
+    override fun updateBalance(client: Client, transaction: Transaction, newBalance: Int): Client? {
         val raceCondition = Filters.and(
             Filters.eq("_id", client.id),
-            Filters.eq("balance", client.balance.toString())
+            Filters.eq("balance", client.balance)
         )
 
         val update = Updates.combine(
-            Updates.set("balance", newBalance.toString()),
+            Updates.set("balance", newBalance),
             Updates.push(
                 "transactions", Document(
                     "\$each", listOf(
                         Document(
                             mapOf(
-                                "value" to transaction.value.toString(),
+                                "value" to transaction.value,
                                 "type" to transaction.type,
                                 "description" to transaction.description,
-                                "date" to transaction.date
+                                "date" to LocalDateTime.now()
                             )
                         )
                     )
@@ -62,17 +62,17 @@ class ClientDatabaseAdapter : ClientDatabasePort {
 
     private fun convertDocumentToClient(doc: Document) = Client(
         id = doc.getInteger("_id"),
-        balance = doc.getString("balance").toBigInteger(),
-        limit = doc.getString("limit").toBigInteger(),
+        balance = doc.getInteger("balance"),
+        limit = doc.getInteger("limit"),
         last10Transactions = doc.getList("transactions", Document::class.java)
             .map {
                 Transaction(
-                    value = it.getString("value").toBigInteger(),
+                    value = it.getInteger("value"),
                     type = TransactionType.valueOf(it.getString("type")),
                     date = it.getDate("date").toInstant().atZone(ZoneOffset.UTC).toLocalDateTime(),
                     description = it.getString("description")
                 )
-            }
+            }.sortedByDescending { it.date }
     )
 
 }

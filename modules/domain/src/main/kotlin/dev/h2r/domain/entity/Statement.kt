@@ -1,6 +1,5 @@
 package dev.h2r.domain.entity
 
-import java.math.BigInteger
 import java.time.LocalDateTime
 
 data class Statement(
@@ -9,7 +8,7 @@ data class Statement(
 )
 
 data class Balance(
-    val total: BigInteger,
+    val total: Int,
     val date: LocalDateTime,
-    val limit: BigInteger
+    val limit: Int
 )
