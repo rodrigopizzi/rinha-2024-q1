@@ -2,7 +2,6 @@ package dev.h2r.plugins
 
 import dev.h2r.infra.database.DatabaseSingleton
 import io.ktor.server.application.*
-import javax.xml.crypto.Data
 
 fun Application.database() {
     val host = environment.config.property("ktor.database.host").getString()
